@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-Created on Mon Jan 13 10:54:21 2020
-This will be a script of functions to run for the simulator
-
-@author: atttjmg1
+Note: The code in this file are meant to be coded in a way that it can be used as a module.
 """
 import os
 import pandas as pd
@@ -14,11 +10,7 @@ import matplotlib.pyplot as plt
 from math import floor
 import operator
 
-### Assume we import this file as a module, this script
-### should be able to work with any kind of similar datasets
-### for now we will assume that this dataset is the example.
 data = pd.read_excel('DATA_20200109_sent.xlsx')
-###############################################
 
 def dt_converter(dt):
        """
@@ -245,24 +237,6 @@ class PM():
                      if current_hour != work_shift_meal_times[self.work_shift] and self.working_hours[(work_shift_meal_times[self.work_shift] + 1) % 24] == 1:
                             return True
               # have to add in their meal timings
-# =============================================================================
-#               for the 7:30am - 7:30pm shifts,
-#               meal timings are 11:30am-12:30pm or 12:30pm-1:30pm
-#               for the 7:30pm - 7:30am shifts,
-#               meal timings are 1:30am-2:30am or 2:30am-3:30am
-# =============================================================================
-# =============================================================================
-#               for the 8:30am - 8:30pm shifts,
-#               meal timings are 11:30am-12:30pm
-#               for the 8:30pm - 8:30am shifts,
-#               meal timings are 1:30am-2:30am
-# =============================================================================
-# =============================================================================
-#               for the 9:30am - 9:30pm shifts,
-#               meal timings are 12:30pm-1:30pm
-#               for the 9:30pm - 9:30am shifts,
-#               meal timings are 2:30am-3:30am
-# =============================================================================
               return False
 
        def reset_tracking(self):
@@ -469,9 +443,9 @@ threshold_vehicle_half = 25 # if the other side has this many or below, it'll se
 
 # tracking of Prime Movers as a whole
 PMs_track = {'tuas': tuas_vehicles,         # stands for Prime Movers
-       'city': city_vehicles,
-       'transit': {'dest': [], 'time' : [], 'index': [], 'size': []}
-       }
+             'city': city_vehicles,
+             'transit': {'dest': [], 'time' : [], 'index': [], 'size': []}
+             }
 
 # tracking containers
 container = {'moved_index': [],
@@ -497,9 +471,6 @@ empty_load = [0]
 
 # how many PMs to move over, when either side is low in PMs
 move_over = 1
-
-# emergency PMs (buffer)
-#buffer = 30
 
 # Initialize PMs
 PMs = {}
@@ -691,7 +662,6 @@ def change_variable(value, name):
        global threshold_dd_empty
        global PMs_track
        global move_over
-       #global buffer
        global container
        global forward_dd
        global threshold_transit_to_dest
@@ -894,7 +864,7 @@ def shift_change_analysis(shift):
               end_shift_pm_locations.append(end_shift_locations)
        tuas = 0
        city = 0
-       # at this point, end_shift_pm_locations = [['city', 'tuas', ...], [...], [...], ...], each element is a list of all the locations a particular pm was at by the end of the shift
+       
        for i in end_shift_pm_locations:
               tuas += i.count('tuas')
               city += i.count('city')
@@ -908,9 +878,7 @@ def shift_change_analysis(shift):
        plt.pie([tuas, city], labels = ['tuas', 'city'], autopct = make_autopct([tuas, city]))
        plt.show()
 
-#################################################################
-# debug = []
-
+# simulation model
 def simulate_shifting(df, n = 1000, bl = 100, init = 200):
        """
        function:     simulates the shifting of containers between tuas and city
@@ -1180,77 +1148,6 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 200):
 
                                                  full_load[0] += 1
                                           
-                                          
-# =============================================================================
-#                      # check once more for back log
-#                      back_log_to_city_postupdate = sum((df.iloc[[ind for ind, stat in enumerate(container['moved_index'][:i]) if stat == 0], :])['DIRECTION_shift'] == 'EB_City')
-#                      back_log_to_tuas_postupdate = sum((df.iloc[[ind for ind, stat in enumerate(container['moved_index'][:i]) if stat == 0], :])['DIRECTION_shift'] == 'WB_Tuas')
-#                      index_zero = [ind for ind, e in enumerate(container['moved_index'][:i]) if e == 0]
-#                      # should be the indexes of containers that haven't been moved, sorted by order of urgency
-#                      index_zero.sort(key = lambda x: df.iloc[x, 10] - get_hours(disc_dt - df.iloc[x, 5]))
-#
-#                      if back_log_to_city_postupdate > threshold_back_log or back_log_to_tuas_postupdate > threshold_back_log:
-#                             for next_to_move in range(move_over*2):
-#                                    number = index_zero[next_to_move]
-#                                    zero_obs = df.iloc[number, :]
-#                                    zero_going_to, zero_connect_time, zero_disc_dt, zero_container_size = zero_obs[1], zero_obs[10], datetime.datetime.utcfromtimestamp(zero_obs[5].tolist()/1e9), zero_obs[2]
-#                                    if zero_container_size >= 22:
-#                                           zero_container_size = 'full'
-#                                    else:
-#                                           zero_container_size = 'half'
-#                                    if zero_going_to == 'EB_City':
-#                                           # get a PM
-#                                           duty_pm = check_pm_avail(disc_dt, 'city', zero_container_size)
-#                                           if PMs_track['tuas'] > 0 and duty_pm:
-#                                                  # update duty_pm
-#                                                  duty_pm.location = 'transit'
-#                                                  duty_pm.current_dest = 'city'
-#                                                  duty_pm.trips_count[zero_container_size] += 1
-#                                                  duty_pm.trips_count['dest'] += ['city']
-#                                                  duty_pm.work_log['depart'] += [disc_dt]
-#                                                  duty_pm.work_log['container'] += [number]
-#
-#                                                  PMs_track['tuas'] -= 1
-#
-#                                                  PMs_track['transit']['time'] += [disc_dt]
-#                                                  PMs_track['transit']['dest'] += ['city']
-#                                                  PMs_track['transit']['index'] += [number]
-#                                                  PMs_track['transit']['size'] += [zero_container_size]
-#
-#                                                  container['moved_index'][number] = 1
-#                                                  container['time']['depart'][number] = disc_dt
-#                                                  if zero_container_size == 'full':
-#                                                         full_load[0] += 1
-#                                                  else:
-#                                                         half_load[0] += 1
-#                                    else:
-#                                           # get a PM
-#                                           duty_pm = check_pm_avail(disc_dt, 'tuas', zero_container_size)
-#                                           if PMs_track['city'] > 0 and duty_pm:
-#                                                  # update duty_pm
-#                                                  duty_pm.location = 'transit'
-#                                                  duty_pm.current_dest = 'tuas'
-#                                                  duty_pm.trips_count[zero_container_size] += 1
-#                                                  duty_pm.trips_count['dest'] += ['tuas']
-#                                                  duty_pm.work_log['depart'] += [disc_dt]
-#                                                  duty_pm.work_log['container'] += [number]
-#
-#                                                  PMs_track['city'] -= 1
-#
-#                                                  PMs_track['transit']['time'] += [disc_dt]
-#                                                  PMs_track['transit']['dest'] += ['tuas']
-#                                                  PMs_track['transit']['index'] += [number]
-#                                                  PMs_track['transit']['size'] += [zero_container_size]
-#
-#                                                  container['moved_index'][number] = 1
-#                                                  container['time']['depart'][number] = zero_disc_dt
-#                                                  if zero_container_size == 'full':
-#                                                         full_load[0] += 1
-#                                                  else:
-#                                                         half_load[0] += 1
-#
-# =============================================================================
-
               # for full length containers
               if container_size > 22:
                      # initiate PM
@@ -1306,8 +1203,6 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 200):
                      # finding other half loads that are available
                      index, index_going_to, index_container_size = None, None, None
                      if 0 in container['moved_index'][:i]:
-                            # search for the first 0 then start from there. so we slice from [first zero index:i] (can be O(logn))
-                            # settling any prior container of size 20 that's yet to be shipped
                             index_twenties = [j for j, e in enumerate(container['moved_index'][:i]) if e == 0]
                             for c_i in index_twenties:
                                    index_obs = df.iloc[c_i, :]
@@ -1370,8 +1265,6 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 200):
                      # if there're no other half loads available
                      else:
                             if going_to == 'EB_City':
-                                   # 1. too little PMs on the other side, 2. connection time is low, 3. demand towards where it's leaving from is high
-                                   ################# Should we be considering back log? Like if there're a lot of backlog, then just send lor
                                    if (PMs_track[going_to[3:].lower()] < threshold_vehicle_half and dd_to_tuas > threshold_dd) or connect_time < threshold_connectingtime: # or ((transit_to_tuas/back_log_to_city >= threshold_transit_to_dest) and back_log_to_city > threshold_back_log):
                                           # get a PM
                                           duty_pm = check_pm_avail(disc_dt, 'city', 'half')
@@ -1482,22 +1375,6 @@ def plot_vehicle_pattern():
        input:        None
        returns:      plots
        """
-# =============================================================================
-#        plt.subplot(3, 1, 1)
-#        plt.title('city')
-#        plt.plot(range(1, len(city_track) + 1), city_track)
-#        #plt.plot(range(1, len(city_track) + 1), [buffer]*len(city_track))
-#        plt.subplot(3, 1, 2)
-#        plt.title('tuas')
-#        plt.plot(range(1, len(tuas_track) + 1), tuas_track)
-#        #plt.plot(range(1, len(tuas_track) + 1), [buffer]*len(tuas_track))
-#        plt.subplot(3, 1, 3)
-#        plt.title('transit')
-#        plt.plot(range(1, len(transit_track) + 1), transit_track)
-#        plt.subplots_adjust(hspace = 0.8)
-#        plt.show()
-# =============================================================================
-       
        plt.bar(range(len(city_track)),
                city_track,
                label = 'city',
