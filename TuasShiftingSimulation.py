@@ -419,7 +419,8 @@ class PM():
                              autopct = '%1.1f%%',
                              explode = [0.1, 0.1, 0, 0, 0],
                              startangle = 90)
-       
+                     
+                     print('For PM_' + str(self.index))
                      print('\nTime Spent on:\n')
                      print('Idle:\t\t\t', round(total_idle, 2), 'hours', 
                            '\nMeals:\t\t\t', total_meal_time, 'hours', 
