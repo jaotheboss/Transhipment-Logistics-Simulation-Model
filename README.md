@@ -14,3 +14,9 @@ Note:
 - Everything here was coded with Python and solely by myself. 
 
 - The dataset used by this simulation cannot be provided.
+
+**In the Works**
+
+1. Machine Learning Model to determine the optimal parameters
+    
+2. Further improvement in the visualisations of the Simulation Model and the upcoming Machine Learning Model
