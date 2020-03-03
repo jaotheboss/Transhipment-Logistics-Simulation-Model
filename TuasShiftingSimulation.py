@@ -376,7 +376,7 @@ class PM():
                             print('Depart:', depart[i], '\tArrive:', arrive[i])
                      print('Depart:', depart[-1], '\tArrive:', 'Transit')
 
-       def work_time_portfolio(self):
+       def work_time_portfolio(self, show = True):
               """
               function:     to calculate the represent the distribution of work and
                             non-work timings for this PM
@@ -384,6 +384,8 @@ class PM():
               output:       graphic of work portfolio
               """
               days_log = self.idle_timings()
+              if days_log == None:
+                     return [0, 0, 0, 0, 0]
               total_idle = 0
               n_arrive = 0
               n_depart = 0
@@ -409,19 +411,22 @@ class PM():
               total_active = total_time - total_idle
               total_mount_time, total_offload_time = 0.25*n_depart, 0.25*n_arrive
               total_on_road = total_active - total_mount_time - total_offload_time
+              
+              if show:
+                     plt.pie([total_idle, total_meal_time, total_on_road, total_mount_time, total_offload_time],
+                             labels = ['idle', 'meals', 'on road', 'mount', 'offload'],
+                             labeldistance = 1,
+                             autopct = '%1.1f%%',
+                             explode = [0.1, 0.1, 0, 0, 0],
+                             startangle = 90)
+       
+                     print('\nTime Spent on:\n')
+                     print('Idle:\t\t\t', round(total_idle, 2), 'hours', 
+                           '\nMeals:\t\t\t', total_meal_time, 'hours', 
+                           '\nOn Road:\t\t', round(total_on_road, 2), 'hours',  
+                           '\nMounting/Offload:\t', total_mount_time + total_offload_time, 'hours')
+              return [total_idle, total_meal_time, total_on_road, total_mount_time, total_offload_time]
 
-              plt.pie([total_idle, total_meal_time, total_on_road, total_mount_time, total_offload_time],
-                      labels = ['idle', 'meals', 'on road', 'mount', 'offload'],
-                      labeldistance = 1,
-                      autopct = '%1.1f%%',
-                      explode = [0.1, 0.1, 0, 0, 0],
-                      startangle = 90)
-
-              print('\nTime Spent on:\n')
-              print('Idle:\t\t\t', round(total_idle, 2), 'hours', 
-                    '\nMeals:\t\t\t', total_meal_time, 'hours', 
-                    '\nOn Road:\t\t', round(total_on_road, 2), 'hours',  
-                    '\nMounting/Offload:\t', total_mount_time + total_offload_time, 'hours')
 
 
 # how many vehicles at each location at the start
@@ -873,10 +878,36 @@ def shift_change_analysis(shift):
               def my_autopct(pct):
                      total = sum(values)
                      val = int(round(pct*total/100.0))
-                     return '{p:.2f}%  ({v:d})'.format(p=pct,v=val)
+                     return '{p:.2f}%  ({v:d})'.format(p = pct,v = val)
               return my_autopct
        plt.pie([tuas, city], labels = ['tuas', 'city'], autopct = make_autopct([tuas, city]))
        plt.show()
+       
+def pm_work_time_portfolio():
+       pms = PMs.values()
+       idle, meal, on_road, mount_time, offload_time = 0, 0, 0, 0, 0
+       for pm in pms:
+              i, m, o, mt, ot = pm.work_time_portfolio(False)
+              idle += i
+              meal += m
+              on_road += o
+              mount_time += mt
+              offload_time += ot
+              
+       plt.pie([idle, meal, on_road, mount_time, offload_time],
+               labels = ['idle', 'meals', 'on road', 'mount', 'offload'],
+               labeldistance = 1,
+               autopct = '%1.1f%%',
+               explode = [0.1, 0.1, 0, 0, 0],
+               startangle = 90)
+       plt.show()
+       
+       print('\n-------------# FOR ALL PMS #-------------\n')
+       print('\nTime Spent on:\n')
+       print('Idle:\t\t\t', round(idle, 2), 'hours', 
+             '\nMeals:\t\t\t', meal, 'hours', 
+             '\nOn Road:\t\t', round(on_road, 2), 'hours',  
+             '\nMounting/Offload:\t', mount_time + offload_time, 'hours')
 
 # simulation model
 def simulate_shifting(df, n = 1000, bl = 100, init = 200):
