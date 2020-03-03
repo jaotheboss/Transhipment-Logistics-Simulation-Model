@@ -1,29 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jan 13 14:29:11 2020
-
-@author: atttjmg1
-"""
-# proportion of time spent for each PM
-# proportion of PM on each side for each time slot
-from os import chdir
-chdir('/Users/jaoming/Desktop/UPIP1920/TSS')
-
 import TuasShiftingSimulation as tss
-# cleaned = tss.clean_data(tss.data)
 
-# since data has been cleaned before, we just read the csv file
 from pandas import read_excel
-data = read_excel('new_data.xlsx')
+data = read_excel('tuas_simulation.xlsx')
 data_scenario_c = tss.extract_scene_data(data, scenario = 'c')
 
-obs_to_run = 10000
-obs_to_bl = 100
-obs_to_init = 200
+obs_to_run = 10000   # observations to run
+obs_to_bl = 100      # observations to back log
+obs_to_init = 200    # observations to initialise 
 
-# to start the simulation
+# execution of the simulation
 tss.simulate_shifting(data_scenario_c, obs_to_run, obs_to_bl, obs_to_init)
 
+# for resetting the variables
 tss.reset_variables()
 # variables for changing
 tss.change_variable(17, 'threshold_connectingtime') # default = 12
@@ -35,12 +23,10 @@ tss.change_variable(10, 'forward_dd') # default = 2
 tss.change_variable(10, 'threshold_vehicle_half') # default = 25
 tss.change_variable(9, 'move_over') # default = 1
 
-tss.full_load[0] / sum(tss.full_load + tss.half_load + tss.empty_load)
 
 ## DIAGNOSTICS
-# track the trend for the amount of PMs at each location
+# these are the variables to check
 x = tss.PMs_track
-# check an example of what each PM takes log of 
 x = tss.PMs['PM_22'].work_log
 x = tss.container
 
@@ -68,27 +54,6 @@ def plot():
        print('Untouched:', not_moved_0s, '   \t(' + str(round((not_moved_0s / total_containers)*100, 2)) + '%)')
        print('Missed:   ', couldnt_move_n2, '   \t(' + str(round((couldnt_move_n2 / total_containers)*100, 2)) + '%)')
 
+# plot the evaluation
 plot()
-
-"""
-Tips to optimizing Python code:
-1. Using the Operator.itemgetter() function. It's basically a slicer.
-operator.itemgetter(1)([5,2,3,4]) will return 2
-operator.itemgetter('key')({'key': 'value'}) will return 'value'
-
-2. Using `map` instead of a loop, because `map`s are built-in constructs
-And the python engine takes up substantial efforts in interpreting the loop constructs
-
-3. Using built-in functions in general
-- `map`, `enumerate`, `eval`, `filter`, `open`, anything from os module, `
-
-4. Limit Method Lookup
-for it in xrange(10000):
-       myLib.findMe(it)
-
-instead of the above, we do this -
-findMe = myLib.findMe
-for it in xrange(10000):
-       findMe(it)
-"""
        
