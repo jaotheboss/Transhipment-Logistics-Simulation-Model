@@ -171,6 +171,26 @@ def extract_scene_data(df, scenario):
               scene_c_data = scene_c_data.sort_values(['DISC_DT'])
               scene_c_data = scene_c_data.reset_index()
               return scene_c_data
+       
+def fill_fake_events(df):
+       """
+       function:     to fill the DISC_DT of the dataframe with fake event intervals
+       input:        DataFrame with a DISC_DT variable
+       output:       DataFrame that includes fake observations 
+       """
+       result = df.copy()
+       disc_dt = result.loc[:, 'DISC_DT']
+       for i in range(1, len(disc_dt)):
+              if i % 1000 == 0:
+                     print(i)
+              end, start = disc_dt[i], disc_dt[i - 1]
+              diff = (end - start).seconds
+              if diff >= 3600: # 30 minutes
+                     period = pd.period_range(start + datetime.timedelta(minutes = 1), end - datetime.timedelta(minutes = 1), freq = '5T').to_timestamp()
+                     for dt in period:
+                            result = result.append(pd.DataFrame([[-1, 'Neither', -1, -1, None, dt, None, None, None, None, -1, -1]], columns = result.columns))
+       result.to_csv('result_with_fake_events.csv')
+       return result
 
 # defining all the variables that will be used for tracking in the simulation
 # PM Class to track the PMs
