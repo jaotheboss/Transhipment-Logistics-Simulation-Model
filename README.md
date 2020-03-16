@@ -15,6 +15,13 @@ Note:
 
 - The dataset used by this simulation cannot be provided.
 
+## Updates:
+
+- The original files `TSS Execution.py` and `TuasShiftingSimulation.py` has been replaced by `Class_TSS Execution.py` and, `Class_TuasShiftingSimulation.py` and `SimulationDataCleaner.py` respectively. 
+- The execution file has been streamlined and updated to be based off the 2 new modules that were updated/created for the simulation.
+- The 2 new modules are split from the original file for better organisation. The `SimulationDataCleaner.py` file is used solely to clean raw files for the dataset to work with the `Class_TuasShiftingSimulation.py` simulation module.
+- The `Class_TuasShiftingSimulation.py` has been updated and organized into classes instead of separate functions for all. This is for easy readability for next few users. 
+
 **In the Works**
 
 1. Machine Learning Model to determine the optimal parameters
