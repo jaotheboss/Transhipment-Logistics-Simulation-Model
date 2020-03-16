@@ -8,7 +8,7 @@ import numpy as np
 from itertools import compress
 import matplotlib.pyplot as plt
 from math import floor
- 
+
 data = pd.read_excel('DATA_20200109_sent.xlsx')
 
 def dt_converter(dt):
@@ -328,7 +328,9 @@ class PM():
               
               if self.work_shift[1] == 'm':
                      while (last_day - curr_day).days >= 0:
+                            # clean_a = list(filter(lambda x: (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day), a))
                             clean_a = [x for x in a if (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day)]
+                            # clean_d = list(filter(lambda x: (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day), d))
                             clean_d = [x for x in d if (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day)]
                             
                             day_log = {'depart': clean_d + [datetime.datetime(curr_day.year, curr_day.month, curr_day.day, int(self.work_shift[0]) + 12, 30, 0)], 
@@ -341,12 +343,14 @@ class PM():
                             last_day += datetime.timedelta(days = 1)
                      while (last_day - curr_day).days > 0:
                             clean_a = [x for x in a if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30)]
+                            
                             clean_d = [x for x in d if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30)]
                             clean_d += [datetime.datetime(last_day.year, last_day.month, last_day.day, int(self.work_shift[0]), 30, 0)]
                             
                             last_day -= datetime.timedelta(days = 1)
                             
                             clean_a = [x for x in a if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30)] + clean_a
+                         
                             clean_d = [x for x in d if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30)] + clean_d
                             clean_a = [datetime.datetime(last_day.year, last_day.month, last_day.day, int(self.work_shift[0]) + 12, 30, 0)] + clean_a
                             
@@ -471,6 +475,7 @@ PMs_track = {'tuas': tuas_vehicles,         # stands for Prime Movers
        }
 
 # tracking containers
+              
 container = {'moved_index': [],
              'time': {'depart': [], 'arrive': []},
              'excess': []
@@ -501,9 +506,6 @@ empty_load = [0]
 
 # how many PMs to move over, when either side is low in PMs
 move_over = 1
-
-# emergency PMs (buffer)
-#buffer = 30
 
 # Initialize PMs
 PMs = {}
@@ -808,20 +810,20 @@ def pm_arrival_updater(duration_out, size, timing):
                      if s == 'full':
                             # this timing would include the mounting time at PP/Tuas
                             # and the offload time at PP/Tuas
-                            if do > 2.5 + 0.25 + 0.25:
+                            if do > (2.5 + 0.25 + 0.25):
                                    return False
                             else:
                                    return True
                      elif s == 'half':
                             # this timing would include the mounting time at PP/Tuas
                             # and the offload time at PP/Tuas
-                            if do > 2.3 + 0.25 + 0.25:
+                            if do > (2.3 + 0.25 + 0.25):
                                    return False
                             else:
                                    return True
                      else:
                             # only the travel time
-                            if do > 2 + 0.25 + 0.25:
+                            if do > (2 + 0.25 + 0.25):
                                    return False
                             else:
                                    return True
@@ -829,20 +831,20 @@ def pm_arrival_updater(duration_out, size, timing):
                      if s == 'full':
                             # this timing would include the mounting time at PP/Tuas
                             # and the offload time at PP/Tuas
-                            if do > 2 + 0.25 + 0.25:
+                            if do > (2 + 0.25 + 0.25):
                                    return False
                             else:
                                    return True
                      elif s == 'half':
                             # this timing would include the mounting time at PP/Tuas
                             # and the offload time at PP/Tuas
-                            if do > 1.8 + 0.25 + 0.25:
+                            if do > (1.8 + 0.25 + 0.25):
                                    return False
                             else:
                                    return True
                      else:
                             # this is only travel time
-                            if do > 1.5 + 0.25 + 0.25:
+                            if do > (1.5 + 0.25 + 0.25):
                                    return False
                             else:
                                    return True
@@ -950,7 +952,9 @@ def export_result():
        arrive = c_t['arrive']
        depart = c_t['depart']
        exit_gate_to_offload_time = pd.DataFrame({'depart': depart, 'arrive': arrive})
+       os.chdir(origin + '/Results')
        exit_gate_to_offload_time.to_csv('tss_results.csv')
+       os.chdir(origin)
        
 ################# EVALUATION OF THE SIMULATION ##################
 def plot_vehicle_pattern():
@@ -961,7 +965,7 @@ def plot_vehicle_pattern():
        input:        None
        returns:      plots and a png file
        """
-       
+       os.chdir(origin + '/Results')
        plt.bar(range(len(city_track)),
                city_track,
                label = 'city',
@@ -984,6 +988,7 @@ def plot_vehicle_pattern():
        plt.subplots_adjust(right = 1.5, bottom = 0.1)
        plt.savefig('Vehicle_Pattern.png', bbox_inches = 'tight')
        plt.show()
+       os.chdir(origin)
 
 def plot_varying_loads():
        """
@@ -992,6 +997,7 @@ def plot_varying_loads():
        input:        None
        returns:      plots and a png file
        """
+       os.chdir(origin + '/Results')
        loads = full_load + half_load + empty_load
        plt.bar(x = range(3),
                height = loads,
@@ -1012,7 +1018,7 @@ def plot_varying_loads():
        plt.title('How many of what loaded PMs')
        plt.savefig('Varying_Loads.png')
        plt.show()
-
+       os.chdir(origin)
 
 def load_evaluation():
        """
@@ -1027,19 +1033,22 @@ def load_evaluation():
        print('Proportion of Half Load:\t', round(hl/total, 2))
        print('Proportion of Empty Load:\t', round(el/total, 2))
        
+       os.chdir(origin + '/Results')
        text_file = open('Varying_Loads.txt', 'w')
        text_file.writelines(['Proportion of varying loads:',
                              '\nProportion of Full Load:\t' + str(round(fl/total, 2)),
                              '\nProportion of Half Load:\t' + str(round(hl/total, 2)),
                              '\nProportion of Empty Load:\t' + str(round(el/total, 2))])
        text_file.close()
-
+       os.chdir(origin)
+       
 def plot_dd_back_log():
        """
        function:     to plot out the demand the back log data
        input:        None
        returns:      plots and a png file
        """
+       os.chdir(origin + '/Results')
        plt.subplot(2, 2, 1)
        plt.plot(range(1, len(dd_track_city) + 1), dd_track_city)
        plt.title('Demand towards City')
@@ -1079,7 +1088,8 @@ def plot_dd_back_log():
                              '\nAvg:\t' + str(round(np.mean(back_log_track_tuas), 2)),
                              '\nMax:\t' + str(max(back_log_track_tuas))])
        text_file.close()
-       
+       os.chdir(origin)
+        
 def plot():
        """
        function:     to plot out all the evaluation models and export all the plots and evaluations
@@ -1108,14 +1118,17 @@ def plot():
        print('Untouched:', not_moved_0s, '   \t(' + str(round((not_moved_0s / total_containers)*100, 2)) + '%)')
        print('Missed:   ', couldnt_move_n2, '   \t(' + str(round((couldnt_move_n2 / total_containers)*100, 2)) + '%)')
        
+       os.chdir(origin + '/Results/')
        text_file = open('Container_Diagnostics.txt', 'w')
        text_file.writelines(['Status of Containers (Count):',
-                             'Moved:    ' + str(moved_1s) + '   \t(' + str(round((moved_1s / total_containers)*100, 2)) + '%)',
+                             '\nMoved:    ' + str(moved_1s) + '   \t(' + str(round((moved_1s / total_containers)*100, 2)) + '%)',
                              '\nUntouched:' + str(not_moved_0s) + '   \t(' + str(round((not_moved_0s / total_containers)*100, 2)) + '%)',
                              '\nMissed:   ' + str(couldnt_move_n2) + '   \t(' + str(round((couldnt_move_n2 / total_containers)*100, 2)) + '%)'])
        text_file.close()
+       os.chdir(origin)
+       
 
-#################################################################
+###################################################################
 
 def simulate_shifting(df, n = 1000, bl = 100, init = 250):
        """
@@ -1127,6 +1140,10 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
               while trying to maximize full loads.
 
        """
+       print('Commencement of Simulation with parameters:\n', 
+             str(n) + ' Observations\n', 
+             str(bl) + ' Back-log, and\n', 
+             str(init) + ' for Initialisation')
        # this is to record the movements of the containers
        global container 
        container['moved_index'] = [0]*n
@@ -1169,21 +1186,20 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
               # update the PMs that are on transit, to check if they've reached the other location
               transit = PMs_track['transit']
               if transit['time']:
+                     # declaring the rest of the variables
+                     transit_time, transit_dest, transit_index, transit_size = transit['time'], transit['dest'], transit['index'], transit['size']
+                     
                      # getting the duration each PM has been on transit for
-                     transit_time = transit['time']
                      trans_updater = list(map(lambda x: get_hours(disc_dt - x), transit_time))
                      # the function returns a boolean list of the PMs that have returned or not
-                     trans_updater = pm_arrival_updater(trans_updater, transit['size'], transit_time)
-                     PMs_track['transit']['time'] = list(compress(transit_time, trans_updater))
-
+                     trans_updater = pm_arrival_updater(trans_updater, transit_size, transit_time)
+                     
                      # update the venues and container
-                     transit_dest, transit_index, transit_size = transit['dest'], transit['index'], transit['size']
                      finished_pm_index = [a for a, b in enumerate(trans_updater) if b == False]
-
                      for index in finished_pm_index:
                             # update location count
                             PMs_track[transit_dest[index]] += 1
-
+                            
                             # update PMs
                             arrived_pm = list(filter(lambda x: transit_index[index] in x.work_log['container'], PMs.values()))[0] 
                             arrived_pm.location, arrived_pm.current_dest = arrived_pm.current_dest, None
@@ -1203,7 +1219,8 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
                                           arrival_index = transit_index[index]
                                           container['time']['arrive'][arrival_index] = disc_dt
                                           container['excess'][arrival_index] = df.iat[arrival_index, 4] - get_hours(disc_dt - container['time']['depart'][arrival_index] - datetime.timedelta(minutes = 15))
-
+                     
+                     PMs_track['transit']['time'] = list(compress(transit_time, trans_updater))
                      PMs_track['transit']['dest'] = list(compress(transit_dest, trans_updater))
                      PMs_track['transit']['index'] = list(compress(transit_index, trans_updater))
                      PMs_track['transit']['size'] = list(compress(transit_size, trans_updater))
@@ -1241,9 +1258,8 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
                      # based on the container indexes, i look up its information based on the dataframe
                      for j in index_zero:
                             # will settle the container that has the shortest connection time remaining (from the current time of pm activation to load_dt)
-                            # zero_obs = df.iloc[j, :]
-
                             zero_going_to, zero_container_size, zero_disc_dt, zero_connect_time = df.iat[j, 1], df.iat[j, 2], df.iat[j, 3], df.iat[j, 4]
+                            
                             # while updating the connection time based on when it arrived to the port till the time we can activate a PM to send it
                             zero_connect_time = zero_connect_time - get_hours(disc_dt - zero_disc_dt)
                             if zero_container_size >= 22:
@@ -1255,7 +1271,7 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
                                    container['moved_index'][j] = 'N2'
 
                             # if it's a full load or there's not much time left, we just activate an available PM (if there are any) to send it over
-                            if zero_connect_time < threshold_connectingtime or zero_container_size == 'full':
+                            if zero_connect_time < threshold_connectingtime or zero_container_size == 'full' or container['moved_index'][j] == 'N2':
                                    if zero_going_to == 'EB_City':
                                           # get a PM
                                           duty_pm = check_pm_avail(disc_dt, 'city', zero_container_size)
@@ -1304,7 +1320,7 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
 
                                                  if container['moved_index'][j] == 0:
                                                         container['moved_index'][j] = 1
-                                                 container['time']['depart'][j] = zero_disc_dt + datetime.timedelta(minutes = 15)
+                                                 container['time']['depart'][j] = disc_dt + datetime.timedelta(minutes = 15)
                                                  if zero_container_size == 'full':
                                                         full_load[0] += 1
                                                  else:
@@ -1315,7 +1331,6 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
                      if 0 in container['moved_index'][:i]:
                             index_zero = [ind for ind, e in enumerate(container['moved_index'][:i]) if e == 0]
                             # only handling half containers
-                            # index_zero = list(filter(lambda x: df.iat[x, 2] == 20, index_zero))
                             index_zero = [x for x in index_zero if df.iat[x, 2] == 20]
                             
                             index_zero_to_tuas = [x for x in index_zero if df.iat[x, 1] == 'WB_Tuas'] # list(filter(lambda x: df.iat[x, 1] == 'WB_Tuas', index_zero))
@@ -1323,7 +1338,7 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
                             # sort by connection time remaining (shortest to longest)
                             index_zero_to_tuas.sort(key = lambda x: df.iat[x, 4] - get_hours(disc_dt - df.iat[x, 3])) 
                             
-                            index_zero_to_city = [x for x in index_zero if df.iat[x, 1] == 'EB_City']# list(filter(lambda x: df.iat[x, 1] == 'EB_City', index_zero))
+                            index_zero_to_city = [x for x in index_zero if df.iat[x, 1] == 'EB_City'] # list(filter(lambda x: df.iat[x, 1] == 'EB_City', index_zero))
                             # sort by connection time remaining (shortest to longest)
                             index_zero_to_city.sort(key = lambda x: df.iat[x, 4] - get_hours(disc_dt - df.iat[x, 3])) 
                             
@@ -1507,7 +1522,6 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
                      # if there're no other half loads available
                      else:
                             if going_to == 'EB_City':
-                                   # 1. too little PMs on the other side, 2. connection time is low, 3. demand towards where it's leaving from is high
                                    if (PMs_track[going_to[3:].lower()] < threshold_vehicle_half and dd_to_tuas > threshold_dd) or connect_time < threshold_connectingtime: # or ((transit_to_tuas/back_log_to_city >= threshold_transit_to_dest) and back_log_to_city > threshold_back_log):
                                           # get a PM
                                           duty_pm = check_pm_avail(disc_dt, 'city', 'half')
@@ -1610,4 +1624,3 @@ def simulate_shifting(df, n = 1000, bl = 100, init = 250):
        # to export a .csv file
        export_result()
        plot()
-
