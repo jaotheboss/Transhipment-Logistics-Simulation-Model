@@ -1,3 +1,13 @@
+"""
+This module is outdated as of 16 March 2020. 
+This execution file has been replaced by:
+- Class_TSS Execution.py
+
+The simulation module has also been replaced by and split into:
+- Class_TuasShiftingSimulation.py (Simulation)
+- SimulationDataCleaner.py (Cleaning)
+"""
+
 # importing module for simulation
 import TuasShiftingSimulation as tss
 
