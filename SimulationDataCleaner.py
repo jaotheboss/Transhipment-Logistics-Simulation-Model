@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 16 14:29:14 2020
-
-@author: jaoming
-"""
 import os
 import pandas as pd
 import datetime
