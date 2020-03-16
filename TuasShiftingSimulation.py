@@ -1,4 +1,14 @@
 """
+This module is outdated as of 16 March 2020. 
+This module has been split and replaced by:
+- Class_TuasShiftingSimulation.py (Simulation)
+- SimulationDataCleaner.py (Cleaning)
+
+The execution file has also been replaced by:
+- Class_TSS Execution.py
+"""
+
+"""
 This .py file is to be read as a module
 """
 import os
