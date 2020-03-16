@@ -1,3 +1,6 @@
+"""
+[2/2] of the module that replaced `TuasShiftingSimulation.py`.
+"""
 import os
 import pandas as pd
 import datetime
@@ -6,7 +9,7 @@ from itertools import compress
 import matplotlib.pyplot as plt
 from math import floor
 
-origin = '/Users/jaoming/Desktop/UPIP1920/TSS'
+origin = '*insert the original location of all your modules and files*'
 
 # PM Class
 class PM():
@@ -83,24 +86,6 @@ class PM():
                      if current_hour != work_shift_meal_times[self.work_shift] and self.working_hours[(work_shift_meal_times[self.work_shift] + 1) % 24] == 1:
                             return True
               # have to add in their meal timings
-# =============================================================================
-#               for the 7:30am - 7:30pm shifts,
-#               meal timings are 11:30am-12:30pm or 12:30pm-1:30pm
-#               for the 7:30pm - 7:30am shifts,
-#               meal timings are 1:30am-2:30am or 2:30am-3:30am
-# =============================================================================
-# =============================================================================
-#               for the 8:30am - 8:30pm shifts,
-#               meal timings are 11:30am-12:30pm
-#               for the 8:30pm - 8:30am shifts,
-#               meal timings are 1:30am-2:30am
-# =============================================================================
-# =============================================================================
-#               for the 9:30am - 9:30pm shifts,
-#               meal timings are 12:30pm-1:30pm
-#               for the 9:30pm - 9:30am shifts,
-#               meal timings are 2:30am-3:30am
-# =============================================================================
               return False
 
        def reset_tracking(self):
@@ -187,17 +172,16 @@ class PM():
                      if a[-1].hour >= 19:
                             last_day += datetime.timedelta(days = 1)
                      while (last_day - curr_day).days > 0:
-                            # clean_a = list(filter(lambda x: (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30), a))
+                            
                             clean_a = [x for x in a if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30)]
-                            # clean_d = list(filter(lambda x: (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30), d))
+                            
                             clean_d = [x for x in d if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30)]
                             clean_d += [datetime.datetime(last_day.year, last_day.month, last_day.day, int(self.work_shift[0]), 30, 0)]
                             
                             last_day -= datetime.timedelta(days = 1)
                             
-                            # clean_a = list(filter(lambda x: (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30), a)) + clean_a
                             clean_a = [x for x in a if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30)] + clean_a
-                            # clean_d = list(filter(lambda x: (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30), d)) + clean_d
+                           
                             clean_d = [x for x in d if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30)] + clean_d
                             clean_a = [datetime.datetime(last_day.year, last_day.month, last_day.day, int(self.work_shift[0]) + 12, 30, 0)] + clean_a
                             
@@ -299,6 +283,22 @@ class PM():
 
 # Simulation Class
 class Simulation():
+       """
+       This is the simulation class that will be used to run the simulation model
+       input:        
+              tuas_vehicles = initial number of vehicles at tuas
+              city_vehicles = initial number of vehicles at city
+              threshold_connectingtime = at how many hours is it considered urgent
+              threshold_back_log = what's the limit of backlog that's tolerable
+              threshold_dd = what's the limit of demand that's tolerable
+              threshold_dd_empty = what's the limit of demand that's tolerable for moving an empty PM
+              threshold_transit_to_dest = what's the ratio limit based on the demand from that location A 
+                                          to go to location B and the number of vehicles that are heading to
+                                          location A
+              forward_dd = how many hours to look ahead to check demand
+              threshold_vehicle_half = at how many hours is it considered urgent to send half a load by itself
+              move_over = how many empty PMs to moveover at a time
+       """
        def __init__(self, tuas_vehicles = 150, 
                     city_vehicles = 150, 
                     threshold_connectingtime = 12, 
@@ -329,15 +329,13 @@ class Simulation():
               # how many PMs to move over, when either side is low in PMs
               self.move_over = move_over
 
-       
               # tracking of Prime Movers as a whole
               self.PMs_track = {'tuas': tuas_vehicles,         # stands for Prime Movers
                                 'city': city_vehicles,
                                 'transit': {'dest': [], 'time' : [], 'index': [], 'size': []}
                                 }
               
-              # tracking containers
-                            
+              # tracking containers 
               self.container = {'moved_index': [],
                                 'time': {'depart': [], 'arrive': []},
                                 'excess': []
@@ -358,7 +356,6 @@ class Simulation():
               self.half_load = 0
               self.empty_load = 0
 
-              
               # Initialize PMs
               self.PMs = {}
               for i in range(1, 301):
@@ -939,7 +936,6 @@ class Simulation():
                             # based on the container indexes, i look up its information based on the dataframe
                             for j in index_zero:
                                    # will settle the container that has the shortest connection time remaining (from the current time of pm activation to load_dt)
-                                   # zero_obs = df.iloc[j, :]
        
                                    zero_going_to, zero_container_size, zero_disc_dt, zero_connect_time = df.iat[j, 1], df.iat[j, 2], df.iat[j, 3], df.iat[j, 4]
                                    # while updating the connection time based on when it arrived to the port till the time we can activate a PM to send it
@@ -1308,4 +1304,3 @@ class Simulation():
               # to export a .csv file
               self.export_result()
               self.plot()                                                                       
-
