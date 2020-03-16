@@ -1,3 +1,6 @@
+"""
+[1/2] of the module that replaced `TuasShiftingSimulation.py`.
+"""
 import os
 import pandas as pd
 import datetime
