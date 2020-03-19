@@ -9,8 +9,6 @@ from itertools import compress
 import matplotlib.pyplot as plt
 from math import floor
 
-origin = '*insert the original location of all your modules and files*'
-
 # PM Class
 class PM():
        """
@@ -29,12 +27,36 @@ class PM():
               self.trips_count = {'full': 0, # trip count for type
                                   'half': 0,
                                   'empty': 0,
-                                  'dest': []}# trip count for destination
+                                  'dest': []} # trip count for destination
               self.working_hours = working_hours
               self.work_shift = work_shift
               self.work_log = {'depart': [], # to track when it departs for transport
                                'arrive': [], # and when it arrives at location
                                'container': []} # to track which PM took which container
+       
+       def get_hours(self, timedelta):
+              """
+              function:     to convert a timedelta object into hours
+              input:        timedelta object
+              returns:      time in terms of hours
+              """
+              result = timedelta.total_seconds()
+              result = (result / 60) / 60
+              result = round(result, 2)
+              return result
+       
+       def flatten(self, container):
+              """
+              function:     to flatten a nested list into a list
+              input:        list
+              output:       flatten object. return as list(flatten(input))
+              """
+              for i in container:
+                     if isinstance(i, (list,tuple)):
+                            for j in self.flatten(i):
+                                   yield j
+                     else:
+                            yield i
 
        def set_working_hours(self, hours):
               """
@@ -42,9 +64,8 @@ class PM():
               input:        a list of the hours (out of 24 hours) that the PM will be working for
               output:       None. Will update the working hours of the PM
               """
-              # hours_working = sum(hours)
               self.working_hours = hours
-              # print('Total hours worked:', hours_working)
+              
 
        def set_work_shift(self, shift):
               """
@@ -66,9 +87,6 @@ class PM():
                      current_hour -= 1
                      if current_hour == -1:
                             current_hour = 23
-              # current_minute = time.time().minute
-              # current_second = time.time().second
-              # 0 represents 12:30am to 1:30am, 23 represents 11:30pm to 12:30am
 
               # flexi
               work_shift_meal_times = {'7m': {'0': 11, '1': 12},
@@ -85,7 +103,6 @@ class PM():
                      # 1 hour gap before they go off for lunch
                      if current_hour != work_shift_meal_times[self.work_shift] and self.working_hours[(work_shift_meal_times[self.work_shift] + 1) % 24] == 1:
                             return True
-              # have to add in their meal timings
               return False
 
        def reset_tracking(self):
@@ -158,9 +175,7 @@ class PM():
               
               if self.work_shift[1] == 'm':
                      while (last_day - curr_day).days >= 0:
-                            # clean_a = list(filter(lambda x: (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day), a))
                             clean_a = [x for x in a if (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day)]
-                            # clean_d = list(filter(lambda x: (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day), d))
                             clean_d = [x for x in d if (x.year == curr_day.year and x.month == curr_day.month and x.day == curr_day.day)]
                             
                             day_log = {'depart': clean_d + [datetime.datetime(curr_day.year, curr_day.month, curr_day.day, int(self.work_shift[0]) + 12, 30, 0)], 
@@ -172,16 +187,13 @@ class PM():
                      if a[-1].hour >= 19:
                             last_day += datetime.timedelta(days = 1)
                      while (last_day - curr_day).days > 0:
-                            
                             clean_a = [x for x in a if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30)]
-                            
                             clean_d = [x for x in d if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour < int(self.work_shift[0])) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) and x.minute <= 30)]
                             clean_d += [datetime.datetime(last_day.year, last_day.month, last_day.day, int(self.work_shift[0]), 30, 0)]
                             
                             last_day -= datetime.timedelta(days = 1)
                             
                             clean_a = [x for x in a if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30)] + clean_a
-                           
                             clean_d = [x for x in d if (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour > int(self.work_shift[0]) + 12) or (x.year == last_day.year and x.month == last_day.month and x.day == last_day.day and x.hour == int(self.work_shift[0]) + 12 and x.minute >= 30)] + clean_d
                             clean_a = [datetime.datetime(last_day.year, last_day.month, last_day.day, int(self.work_shift[0]) + 12, 30, 0)] + clean_a
                             
@@ -194,13 +206,13 @@ class PM():
               for i in days_log:
                      n = len(i['arrive'])
                      for j in range(n):
-                            duration = get_hours(i['depart'][j] - i['arrive'][j])
+                            duration = self.get_hours(i['depart'][j] - i['arrive'][j])
                             total_duration += duration
                             if duration <= 0:
                                    continue
                             print('From:', i['arrive'][j], '\t', 'To:', i['depart'][j], '\tDuration:', duration)
                      if len(i['depart']) != n:
-                            end = (get_hours(i['depart'][-1] - i['depart'][-2]) - 2)
+                            end = (self.get_hours(i['depart'][-1] - i['depart'][-2]) - 2)
                             total_duration += end
               print('\nTotal Duration:', round(total_duration, 2), '\n')
               return days_log
@@ -211,7 +223,7 @@ class PM():
               input:        nothing
               output:       a list of indexes
               """
-              return [x for x in flatten(self.work_log['container']) if type(x) != str] # list(filter(lambda x: type(x) != str, flatten(self.work_log['container'])))
+              return [x for x in self.flatten(self.work_log['container']) if type(x) != str] # list(filter(lambda x: type(x) != str, flatten(self.work_log['container'])))
 
        def retrieve_on_road_timings(self):
               """
@@ -251,12 +263,12 @@ class PM():
                      n_depart += (m - 1)
               
                      for j in range(n):
-                            duration = get_hours(i['depart'][j] - i['arrive'][j])
+                            duration = self.get_hours(i['depart'][j] - i['arrive'][j])
                             total_idle += duration
                             if duration <= 0:
                                    continue
                      if m != n:
-                            total_idle += (get_hours(i['depart'][-1] - i['depart'][-2]) - 2)
+                            total_idle += (self.get_hours(i['depart'][-1] - i['depart'][-2]) - 2)
                             
               n = len(days_log)
               total_time = n*12
@@ -292,9 +304,8 @@ class Simulation():
               threshold_back_log = what's the limit of backlog that's tolerable
               threshold_dd = what's the limit of demand that's tolerable
               threshold_dd_empty = what's the limit of demand that's tolerable for moving an empty PM
-              threshold_transit_to_dest = what's the ratio limit based on the demand from that location A 
-                                          to go to location B and the number of vehicles that are heading to
-                                          location A
+              threshold_empty_movement = what's the the amount of PM at a location that would trigger
+                                          a movement for an empty PM given high demand and backlog
               forward_dd = how many hours to look ahead to check demand
               threshold_vehicle_half = at how many hours is it considered urgent to send half a load by itself
               move_over = how many empty PMs to moveover at a time
@@ -305,7 +316,7 @@ class Simulation():
                     threshold_back_log = 58, 
                     threshold_dd = 55, 
                     threshold_dd_empty = 75, 
-                    threshold_transit_to_dest = 0.2, 
+                    threshold_empty_movement = 2, 
                     forward_dd = 2, 
                     threshold_vehicle_half = 25,
                     move_over = 1):
@@ -318,7 +329,7 @@ class Simulation():
               self.threshold_back_log = threshold_back_log
               self.threshold_dd = threshold_dd
               self.threshold_dd_empty = threshold_dd_empty
-              self.threshold_transit_to_dest = threshold_transit_to_dest
+              self.threshold_empty_movement = threshold_empty_movement
        
               # how many hours forward should we look for the demand
               self.forward_dd = forward_dd
@@ -335,7 +346,8 @@ class Simulation():
                                 'transit': {'dest': [], 'time' : [], 'index': [], 'size': []}
                                 }
               
-              # tracking containers 
+              # tracking containers
+                            
               self.container = {'moved_index': [],
                                 'time': {'depart': [], 'arrive': []},
                                 'excess': []
@@ -404,26 +416,12 @@ class Simulation():
               input:        dictionary of PMs
               output:       the count of PMs that are on their way over to Tuas or City
               """
-              list_of_PMs = list(self.PMs.values())
-              list_of_PMs = list(filter(lambda x: x.location == 'transit', list_of_PMs))
+              list_of_PMs = [pm for pm in self.PMs.values() if pm.location == 'transit']
               city = list(map(lambda x: x.current_dest, list_of_PMs)).count('city')
               tuas = list(map(lambda x: x.current_dest, list_of_PMs)).count('tuas')
               return {'city': city, 'tuas': tuas}
-       
-       def flatten(self, container):
-              """
-              function:     to flatten a nested list into a list
-              input:        list
-              output:       flatten object. return as list(flatten(input))
-              """
-              for i in container:
-                     if isinstance(i, (list,tuple)):
-                            for j in self.flatten(i):
-                                   yield j
-                     else:
-                            yield i
 
-       def container_info(self, data, container_id, info):
+       def container_info(self, data, container_id, info): # not in use
               """
               function:     to extract data out of the dataframe based on the container id
               input:        data, the container id and the information that we want extracted
@@ -529,7 +527,7 @@ class Simulation():
                                           return False
                                    else:
                                           return True
-              result = list(map(boolean_generator, range(len(duration_out))))
+              result = [boolean_generator(i) for i in range(len(duration_out))]
               result = np.array(result)
               return result
        
@@ -557,6 +555,11 @@ class Simulation():
                             return 2
        
        def shift_change_analysis(self, shift):
+              """
+              function:     to analyse the PMs during the shift change period
+              input:        which shift to analyse
+              output:       the analysis and breakdown of all the PMs during that particular shift change
+              """
               pms = self.PMs.values()
               pms = np.array(filter(lambda x: x.work_shift == shift, pms))
               end_shift_pm_locations = []
@@ -790,7 +793,7 @@ class Simulation():
               self.plot_dd_back_log()
               
               # how many containers have been moved
-              total_containers = len(self.container['moved_index']) - self.container['moved_index'].count('init')
+              total_containers = len(self.container['moved_index']) - self.container['moved_index'].count('init') - self.container['moved_index'].count('hs')
               moved_1s = self.container['moved_index'].count(1)
               not_moved_0s = self.container['moved_index'].count(0)
               couldnt_move_n2 = self.container['moved_index'].count('N2')
@@ -809,38 +812,59 @@ class Simulation():
               os.chdir(origin)
               
        ##################### ACTUAL SIMULATION #########################
-       def simulate_shifting(self, df, n = 1000, bl = 100, init = 250):
+       def simulate_shifting(self, df, n = 1000, headspace = 50, bl = 100, init = 50):
               """
               function:     simulates the shifting of containers between tuas and city
-              input:        scenario data in the form of a dataframe
-              returns:      DataFrame [Refer to export_result() function to find out what's being exported]
+              input:        scenario data in the form of a dataframe with only the number of containers that it wants to simulate,
+                            the number of scenario it wants to simulate,
+                            the amount of headspace given to run,
+                            the amount of backlog,
+                            the amount to use for initialisation (something like a seed)
+              returns:      DataFrame [Refer to export_result() function to find out what's being exported] and Plots
        
               Goal:  I'd say it's to minimize the number of half and empty loads
                      while trying to maximize full loads.
        
               """
+              # creating the headspace in the dataset
+              if headspace != 0:
+                     print('Invalid Dataset Format: Dataset requires resolving!\n')
+                     print('Resolving dataset...')
+                     last_date = df.iat[n - 1, 3]
+                     def add_headspace(multiple, date):
+                            return pd.DataFrame([[-1, 'Neither', 0, date + datetime.timedelta(minutes = 5.0 * multiple), -1]], 
+                                                columns = ['index', 'DIRECTION_shift', 'LEN_Q', 'DISC_DT', 'Connect_SceneC'])
+                     for i in range(1, headspace + 1):
+                            df = df.append(add_headspace(i, last_date))
+                     print('Resolved!\n')
+
               print('Commencement of Simulation with parameters:\n', 
-                    str(n) + ' Observations\n', 
+                    str(n) + ' Observations with ' + str(headspace) + ' headspace,\n', 
                     str(bl) + ' Back-log, and\n', 
                     str(init) + ' for Initialisation')
+              
               # this is to record the movements of the containers
-              self.container['moved_index'] = [0]*n
-              self.container['time']['depart'] = [0]*n
-              self.container['time']['arrive'] = [0]*n
-              self.container['excess'] = ['0']*n
+              self.container['moved_index'] = [0]*n + ['hs']*headspace
+              self.container['time']['depart'] = [0]*n + ['hs']*headspace
+              self.container['time']['arrive'] = [0]*n + ['hs']*headspace
+              self.container['excess'] = ['0']*n + ['hs']*headspace
        
-              for i in range(bl, n):
+              for i in range(bl, n + headspace):
+                     # terminate if all containers have been moved
+                     if 0 not in self.container['moved_index']:
+                            break
+                     
                      # this is to 'naturally' initialize the variables
-                     if i == init:
+                     if i == init + bl:
                             # containers that have made the full trip are considered used for initialisation. those that are not will be in transit or considered backlog
-                            container_bool = np.where(np.asarray(self.container['time']['arrive'][:init + 1]) == 0, False, True)
+                            container_bool = np.where(np.asarray(self.container['time']['arrive'][:init + bl + 1]) == 0, False, True)
                             for i, b in enumerate(container_bool):
                                    if b:
                                           self.container['moved_index'][i], self.container['time']['depart'][i], self.container['time']['arrive'][i], self.container['excess'][i] = 'init', 'init', 'init', 'init'
        
                             # restarting the tracking of PMs at Tuas, City and Transit
                             temp = self.transit_track.pop()
-                            self.transit_track.clear()
+                            self.transit_track.clear()   
                             self.transit_track.append(temp)
                             temp = self.tuas_track.pop()
                             self.tuas_track.clear()
@@ -868,7 +892,7 @@ class Simulation():
                             transit_time, transit_dest, transit_index, transit_size = transit['time'], transit['dest'], transit['index'], transit['size']
                             
                             # getting the duration each PM has been on transit for
-                            trans_updater = list(map(lambda x: self.get_hours(disc_dt - x), transit_time))
+                            trans_updater = [self.get_hours(disc_dt - x) for x in transit_time] # changed
                             # the function returns a boolean list of the PMs that have returned or not
                             trans_updater = self.pm_arrival_updater(trans_updater, transit_size, transit_time)
                             
@@ -879,7 +903,7 @@ class Simulation():
                                    self.PMs_track[transit_dest[index]] += 1
                                    
                                    # update PMs
-                                   arrived_pm = list(filter(lambda x: transit_index[index] in x.work_log['container'], self.PMs.values()))[0] 
+                                   arrived_pm = [x for x in self.PMs.values() if transit_index[index] in x.work_log['container']][0] # changed
                                    arrived_pm.location, arrived_pm.current_dest = arrived_pm.current_dest, None
                                    
                                    arrived_pm.work_log['arrive'] += [disc_dt]
@@ -905,8 +929,8 @@ class Simulation():
        
                      # checking of demand and backlog
                      # look before
-                     back_log_to_city = sum((df.iloc[[ind for ind, stat in enumerate(self.container['moved_index'][:i]) if stat == 0], :])['DIRECTION_shift'] == 'EB_City')
-                     back_log_to_tuas = sum((df.iloc[[ind for ind, stat in enumerate(self.container['moved_index'][:i]) if stat == 0], :])['DIRECTION_shift'] == 'WB_Tuas')
+                     back_log_to_city = sum(df.iloc[[ind for ind, stat in enumerate(self.container['moved_index'][:i]) if stat == 0], 1] == 'EB_City')
+                     back_log_to_tuas = sum(df.iloc[[ind for ind, stat in enumerate(self.container['moved_index'][:i]) if stat == 0], 1] == 'WB_Tuas')
                      # look after
                      dd_to_tuas, dd_to_city = 0, 0
                      dd_present_time, dd_advance_time = disc_dt, disc_dt
@@ -935,8 +959,7 @@ class Simulation():
                             index_zero.sort(key = lambda x: df.iat[x, 4] - self.get_hours(disc_dt - df.iat[x, 3]))
                             # based on the container indexes, i look up its information based on the dataframe
                             for j in index_zero:
-                                   # will settle the container that has the shortest connection time remaining (from the current time of pm activation to load_dt)
-       
+                                   # will settle the container that has the shortest connection time remaining (from the current time of pm activation to load_dt)       
                                    zero_going_to, zero_container_size, zero_disc_dt, zero_connect_time = df.iat[j, 1], df.iat[j, 2], df.iat[j, 3], df.iat[j, 4]
                                    # while updating the connection time based on when it arrived to the port till the time we can activate a PM to send it
                                    zero_connect_time = zero_connect_time - self.get_hours(disc_dt - zero_disc_dt)
@@ -944,12 +967,9 @@ class Simulation():
                                           zero_container_size = 'full'
                                    else:
                                           zero_container_size = 'half'
-                                   # if we missed it, we mark as N2
-                                   if zero_connect_time <= self.travel_duration(zero_container_size, zero_disc_dt):
-                                          self.container['moved_index'][j] = 'N2'
        
                                    # if it's a full load or there's not much time left, we just activate an available PM (if there are any) to send it over
-                                   if zero_connect_time < self.threshold_connectingtime or zero_container_size == 'full' or self.container['moved_index'][j] == 'N2':
+                                   if zero_connect_time < self.threshold_connectingtime or zero_container_size == 'full':
                                           if zero_going_to == 'EB_City':
                                                  # get a PM
                                                  duty_pm = self.check_pm_avail(disc_dt, 'city', zero_container_size)
@@ -968,8 +988,11 @@ class Simulation():
                                                         self.PMs_track['transit']['dest'] += ['city']
                                                         self.PMs_track['transit']['index'] += [j]
                                                         self.PMs_track['transit']['size'] += [zero_container_size]
-       
-                                                        if self.container['moved_index'][j] == 0:
+
+                                                        # if we missed it, we mark as N2
+                                                        if zero_connect_time <= self.travel_duration(zero_container_size, disc_dt):
+                                                               self.container['moved_index'][j] = 'N2'
+                                                        else:
                                                                self.container['moved_index'][j] = 1
                                                         self.container['time']['depart'][j] = disc_dt + datetime.timedelta(minutes = 15)
                                                         if zero_container_size == 'full':
@@ -996,28 +1019,34 @@ class Simulation():
                                                         self.PMs_track['transit']['index'] += [j]
                                                         self.PMs_track['transit']['size'] += [zero_container_size]
        
-                                                        if self.container['moved_index'][j] == 0:
+                                                        # if we missed it, we mark as N2
+                                                        if zero_connect_time <= self.travel_duration(zero_container_size, disc_dt):
+                                                               self.container['moved_index'][j] = 'N2'
+                                                        else:
                                                                self.container['moved_index'][j] = 1
                                                         self.container['time']['depart'][j] = disc_dt + datetime.timedelta(minutes = 15)
                                                         if zero_container_size == 'full':
                                                                self.full_load += 1
                                                         else:
                                                                self.half_load += 1
-       
+                                   
+                                   # no point settling backlog if there're no more available PMs on either side
+                                   if self.PMs_track['city'] + self.PMs_track['tuas'] == 0:
+                                          break
+                                   
                             # check if there're still unmoved containers after moving the urgent and full loads
                             # send the half loads as full loads
-                            if 0 in self.container['moved_index'][:i]:
+                            if 0 in self.container['moved_index'][:i] and (self.PMs_track['city'] + self.PMs_track['tuas'] != 0):
                                    index_zero = [ind for ind, e in enumerate(self.container['moved_index'][:i]) if e == 0]
                                    # only handling half containers
-                                   # index_zero = list(filter(lambda x: df.iat[x, 2] == 20, index_zero))
                                    index_zero = [x for x in index_zero if df.iat[x, 2] == 20]
                                    
-                                   index_zero_to_tuas = [x for x in index_zero if df.iat[x, 1] == 'WB_Tuas'] # list(filter(lambda x: df.iat[x, 1] == 'WB_Tuas', index_zero))
+                                   index_zero_to_tuas = [x for x in index_zero if df.iat[x, 1] == 'WB_Tuas'] 
                                    
                                    # sort by connection time remaining (shortest to longest)
                                    index_zero_to_tuas.sort(key = lambda x: df.iat[x, 4] - self.get_hours(disc_dt - df.iat[x, 3])) 
                                    
-                                   index_zero_to_city = [x for x in index_zero if df.iat[x, 1] == 'EB_City'] # list(filter(lambda x: df.iat[x, 1] == 'EB_City', index_zero))
+                                   index_zero_to_city = [x for x in index_zero if df.iat[x, 1] == 'EB_City']
                                    # sort by connection time remaining (shortest to longest)
                                    index_zero_to_city.sort(key = lambda x: df.iat[x, 4] - self.get_hours(disc_dt - df.iat[x, 3])) 
                                    
@@ -1036,7 +1065,7 @@ class Simulation():
                                                         duty_pm.work_log['depart'] += [disc_dt]
                                                         duty_pm.work_log['container'] += [[h, h_index]]
        
-                                                        self.PMs_track['tuas'] -= 1
+                                                        self.PMs_track['city'] -= 1
        
                                                         self.PMs_track['transit']['time'] += [disc_dt]
                                                         self.PMs_track['transit']['dest'] += ['tuas']
@@ -1049,6 +1078,10 @@ class Simulation():
                                                         self.container['time']['depart'][h_index] = disc_dt + datetime.timedelta(minutes = 15)
        
                                                         self.full_load += 1
+                                                 
+                                                 # if there're no more PMs available at city, just break the loop
+                                                 if self.PMs_track['city'] == 0:
+                                                        break
                                           
                                    if index_zero_to_city:
                                           for j in range(1, len(index_zero_to_city), 2):
@@ -1065,7 +1098,7 @@ class Simulation():
                                                         duty_pm.work_log['depart'] += [disc_dt]
                                                         duty_pm.work_log['container'] += [[h, h_index]]
                                                         
-                                                        self.PMs_track['city'] -= 1
+                                                        self.PMs_track['tuas'] -= 1
                                                         
                                                         self.PMs_track['transit']['time'] += [disc_dt]
                                                         self.PMs_track['transit']['dest'] += ['city']
@@ -1078,6 +1111,10 @@ class Simulation():
                                                         self.container['time']['depart'][h_index] = disc_dt + datetime.timedelta(minutes = 15)
        
                                                         self.full_load += 1
+                                                        
+                                                 # if there're no more PMs available at tuas, just break the loop
+                                                 if self.PMs_track['tuas'] == 0:
+                                                        break
        
                      # for full length containers
                      if container_size > 22:
@@ -1130,7 +1167,7 @@ class Simulation():
                                           self.full_load += 1
        
                      # for half length containers
-                     else:
+                     elif container_size > 0:
                             # finding other half loads that are available
                             index, index_going_to, index_container_size = None, None, None
                             if 0 in self.container['moved_index'][:i]:
@@ -1202,7 +1239,7 @@ class Simulation():
                             else:
                                    if going_to == 'EB_City':
                                           # 1. too little PMs on the other side, 2. connection time is low, 3. demand towards where it's leaving from is high
-                                          if (self.PMs_track[going_to[3:].lower()] < self.threshold_vehicle_half and dd_to_tuas > self.threshold_dd) or connect_time < self.threshold_connectingtime: # or ((transit_to_tuas/back_log_to_city >= threshold_transit_to_dest) and back_log_to_city > threshold_back_log):
+                                          if (self.PMs_track[going_to[3:].lower()] < self.threshold_vehicle_half and dd_to_tuas > self.threshold_dd) or connect_time < self.threshold_connectingtime: 
                                                  # get a PM
                                                  duty_pm = self.check_pm_avail(disc_dt, 'city', 'half')
                                                  if self.PMs_track['tuas'] > 0 and duty_pm:
@@ -1249,7 +1286,7 @@ class Simulation():
                                                         self.half_load += 1
        
                      # sending empty PMs to city
-                     if dd_to_tuas > self.threshold_dd_empty and transit_to_city < (self.threshold_transit_to_dest * dd_to_tuas):
+                     if (dd_to_tuas > self.threshold_dd_empty or back_log_to_tuas > self.threshold_back_log) and (self.PMs_track['city'] + transit_to_city <= self.threshold_empty_movement):
                             if self.PMs_track['tuas'] >= self.threshold_vehicle_half:
                                    for p in range(self.move_over):
                                           # get a PM
@@ -1273,7 +1310,7 @@ class Simulation():
                                                  self.empty_load += self.move_over
                      
                      # sending empty PMs to tuas
-                     if dd_to_city > self.threshold_dd_empty and transit_to_tuas < (self.threshold_transit_to_dest * dd_to_city):
+                     if (dd_to_city > self.threshold_dd_empty or back_log_to_city > self.threshold_back_log) and (self.PMs_track['tuas'] + transit_to_tuas <= self.threshold_empty_movement):
                             if self.PMs_track['city'] >= self.threshold_vehicle_half:
                                    for p in range(self.move_over):
                                           # get a PM
@@ -1302,5 +1339,7 @@ class Simulation():
                             print('[' + '###'*prop_done + '   '*(10 - prop_done) + ']' + '  ' + str(prop_done*10) + '% done')
               
               # to export a .csv file
+              print('\nSimulation Complete!')
+              print('Exporting Results and Plotting Evaluation...')
               self.export_result()
               self.plot()                                                                       
