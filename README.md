@@ -18,7 +18,7 @@ Note:
 ## Updates [CAA]:
 
 #### [19/03/2020]
-- 10% improvement in time complexity
+- 70% improvement in time complexity
 
 - Fixed a bug where the N2 containers were not being tracked properly; given the situation that they have been tagged N2 but there're no available PMs, and therefore their turn to be moved is skipped indefinitely
 
