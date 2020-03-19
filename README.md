@@ -17,7 +17,14 @@ Note:
 
 ## Updates [CAA]:
 
-#### [16 March 2020]
+#### [19/03/2020]
+- 10% improvement in time complexity
+
+- Fixed a bug where the N2 containers were not being tracked properly; given the situation that they have been tagged N2 but there're no available PMs, and therefore their turn to be moved is skipped indefinitely
+
+- Updated the logic for sending off empty PMs over to either sides
+
+#### [16/03/2020]
 - The original files `TSS Execution.py` and `TuasShiftingSimulation.py` has been replaced by `Class_TSS Execution.py` and, `Class_TuasShiftingSimulation.py` and `SimulationDataCleaner.py` respectively. 
 
 - The execution file has been streamlined and updated to be based off the 2 new modules that were updated/created for the simulation.
@@ -26,7 +33,7 @@ Note:
 
 - The `Class_TuasShiftingSimulation.py` has been updated and organized into classes instead of separate functions for all. This is for easy readability for next few users. 
 
-#### [12 March 2020]
+#### [12/03/2020]
 - Speed increase by 10%
 
 - Updated plots and prints such that each simulation would eventually:
