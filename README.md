@@ -18,7 +18,7 @@ Note:
 ## Updates [CAA]:
 
 #### [19/03/2020]
-- 70% improvement in time complexity
+- 72.7% improvement in time complexity
 
 - Fixed a bug where the N2 containers were not being tracked properly; given the situation that they have been tagged N2 but there're no available PMs, and therefore their turn to be moved is skipped indefinitely
 
@@ -46,3 +46,12 @@ Note:
 1. Machine Learning Model to determine the optimal parameters
     
 2. Further improvement in the visualisations of the Simulation Model and the upcoming Machine Learning Model
+
+#### Tips and Tricks I've Learnt for Speed Optimisation:
+1. Using numpy for vectorized functions are really quick
+2. For pandas dataframe, using `df.iat[x, y]` for extracting a single value is much faster
+3. Randomisation can be slow, the fastest one would be `np.random.rand()`, although the values are between 0 and 1
+4. Rounding can be slow too. If you want a value of either 0 or 1, you can `int(np.random.rand() + 0.5)`, since `int()` cuts the float
+5. List comprehensions are always much faster than using `filter` or `map`. Although `filter` and `map` are much faster than using loops
+6. Look at all the loops in the program and write lines to stop the loop from running if it's pointless to continue. Basically, add `break` in loops whenever you can
+7. Using `enumerate` to find the index is much faster
