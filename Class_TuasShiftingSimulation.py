@@ -95,7 +95,7 @@ class PM():
                                        '8n': 1,
                                        '9m': 12,
                                        '9n': 2}
-              meal_shift_d = str(round(np.random.rand(), 0))[0]
+              meal_shift_d = str(int(np.random.rand() + 0.5))
               work_shift_meal_times['7m'], work_shift_meal_times['7n'] = work_shift_meal_times['7m'][meal_shift_d], work_shift_meal_times['7n'][meal_shift_d]
 
               # make sure there's a 2 hour gap before they panggang
