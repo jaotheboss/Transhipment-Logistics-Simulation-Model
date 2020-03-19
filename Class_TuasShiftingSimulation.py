@@ -650,25 +650,43 @@ class Simulation():
               returns:      plots and a png file
               """
               os.chdir(origin + '/Results')
+              
+              # plotting the graph
               plt.bar(range(len(self.city_track)),
                       self.city_track,
                       label = 'city',
                       alpha = 0.9,
-                      width = 0.7)
+                      width = 0.7,
+                      color = 'dodgerblue')
               plt.bar(range(len(self.transit_track)),
                       self.transit_track,
                       bottom = self.city_track,
                       label = 'transit',
                       alpha = 0.9,
-                      width = 0.7)
+                      width = 0.7,
+                      color = 'navajowhite')
               plt.bar(range(len(self.tuas_track)),
                       self.tuas_track,
                       bottom = [i + j for i, j in zip(self.city_track, self.transit_track)],
                       label = 'tuas',
                       alpha = 0.9,
-                      width = 0.7)
+                      width = 0.7,
+                      color = 'indianred')
+              
+              # adding the legend
+              topbar = plt.Rectangle((0, 0), 0.2, 0.2, fc = 'indianred', edgecolor = 'none')
+              middlebar = plt.Rectangle((0, 0), 0.2, 0.2, fc = 'navajowhite', edgecolor = 'none')
+              bottombar = plt.Rectangle((0, 0), 0.2, 0.2, fc = 'dodgerblue', edgecolor = 'none')
               plt.ylabel('Proportion'); plt.xlabel('Time')
-              plt.legend()
+              l = plt.legend([topbar, middlebar, bottombar], 
+                             ['Tuas', 'Transit', 'City'], 
+                             loc = 0, 
+                             bbox_to_anchor=(1, 1.1),
+                             ncol = 3, 
+                             prop = {'size': 8})
+              l.draw_frame(False)
+              
+              # adjusting the frame of the plot
               plt.subplots_adjust(right = 1.5, bottom = 0.1)
               plt.savefig('Vehicle_Pattern.png', bbox_inches = 'tight')
               plt.show()
@@ -686,7 +704,7 @@ class Simulation():
               plt.bar(x = range(3),
                       height = loads,
                       align = 'center',
-                      color = 'red')
+                      color = 'lightgreen')
               plt.xticks(ticks = range(3),
                          labels = ['full_load',
                                    'half_load',
