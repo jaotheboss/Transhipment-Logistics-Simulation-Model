@@ -9,7 +9,7 @@ import numpy as np
 # Simulation Data Cleaner Class
 class SimulationDataCleaner():
        """
-       
+       Description:  This class is meant to clean a particular raw data type into something more usable for the simulation.
        """
        def __init__(self, data):
               self.data = data
@@ -121,7 +121,6 @@ class SimulationDataCleaner():
               # remove nan's
               self.data = self.data.loc[np.isnan(self.data['LEN_Q']) == False, :]
        
-              # export = eval(input('Would you like to export the new data? [True/False]: '))
               if export:
                      self.data.to_excel(os.getcwd() + '\\new_data.xlsx', index = False)
        
