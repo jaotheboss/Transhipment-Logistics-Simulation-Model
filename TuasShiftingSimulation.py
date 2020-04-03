@@ -19,7 +19,7 @@ from itertools import compress
 import matplotlib.pyplot as plt
 from math import floor
 
-data = pd.read_excel('DATA_20200109_sent.xlsx')
+data = pd.read_excel('data.xlsx')
 
 def dt_converter(dt):
        """
@@ -143,7 +143,6 @@ def extract_scene_data(df, scenario):
        returns:      dataset for a particular scenario
        """
        # retrieve the scenario that's been requested to be extracted
-       # scenario = input('Which scenario data would you like extracted? [a, b, c]: ')
 
        if scenario == 'a':
               # only extracting variables for scenario A
