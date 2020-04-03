@@ -15,6 +15,10 @@ Note:
 
 - The dataset used by this simulation cannot be provided.
 
+- There were 2 original files, the model and execution file. However, i've come to realise the how messy things could get and have converted my 2 original files into 3 different kinds of files - Cleaning, Model and Execution
+
+- All 3 of these files, except for the Execution file, are in class form for easier readability. 
+
 #### Tips and Tricks I've Learnt for Speed Optimisation:
 1. Using numpy for vectorized functions are really quick
 2. For pandas dataframe, using `df.iat[x, y]` for extracting a single value is much faster
