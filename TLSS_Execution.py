@@ -8,11 +8,11 @@ Created on Mon Mar 16 15:17:37 2020
 import time
 from os import chdir
 import pandas as pd
-chdir('/Users/jaoming/Desktop/UPIP1920/TSS')
+chdir('your default directory')
 
 # importing cleaner and simulation module
 from SimulationDataCleaner import SimulationDataCleaner
-import TransLogShiftingSimulation_v2 as tlss
+import TransLogShiftingSimulation as tlss
 
 # cleaning and extracting of data
 from_start = False # if we want to start from a raw file
