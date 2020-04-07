@@ -108,21 +108,26 @@ After the running of the Simulation, things should be returned are:
 
 ## Updates [CAA]:
 
+#### [02/04/2020]
+- Shifted around the algorithm for an increase in efficiency. Resulted in a 50% increase in timing.
+
+- Added a timing option such that i wouldn't have to use magic functions in the interactive shell. 
+
 #### [19/03/2020]
 - 72.7% improvement in time complexity
 
-- Fixed a bug where the N2 containers were not being tracked properly; given the situation that they have been tagged N2 but there're no available PMs, and therefore their turn to be moved is skipped indefinitely
+- Fixed a bug where the Late containers were not being tracked properly; given the situation that they have been tagged Late but there're no available PMs, and therefore their turn to be moved is skipped indefinitely
 
 - Updated the logic for sending off empty PMs over to either sides
 
 #### [16/03/2020]
-- The original files `TSS Execution.py` and `TuasShiftingSimulation.py` has been replaced by `Class_TSS Execution.py` and, `Class_TuasShiftingSimulation.py` and `SimulationDataCleaner.py` respectively. 
+- The original file `TransLogShiftingSimulation.py` has been replaced by class versions. This is such that it would be easier to read and track
 
 - The execution file has been streamlined and updated to be based off the 2 new modules that were updated/created for the simulation.
 
-- The 2 new modules are split from the original file for better organisation. The `SimulationDataCleaner.py` file is used solely to clean raw files for the dataset to work with the `Class_TuasShiftingSimulation.py` simulation module.
+- The 2 new modules are split from the original file for better organisation. The `SimulationDataCleaner.py` file is used solely to clean raw files for the dataset to work with the `TransLogShiftingSimulation.py` simulation module.
 
-- The `Class_TuasShiftingSimulation.py` has been updated and organized into classes instead of separate functions for all. This is for easy readability for next few users. 
+- The `TransLogShiftingSimulation.py` has been updated and organized into classes instead of separate functions for all. This is for easy readability for next few users. 
 
 #### [12/03/2020]
 - Speed increase by 10%
