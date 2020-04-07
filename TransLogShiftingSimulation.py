@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from math import floor
 
 # change the origin file for your workstation
-origin = '/Users/jaoming/Desktop/UPIP1920/TSS'
+origin = 'your origin directory'
 
 # PM Class
 class PM():
@@ -33,17 +33,14 @@ class PM():
               self.work_log = {'depart': [], # to track when it departs for transport
                                'arrive': [], # and when it arrives at location
                                'container': []} # to track which PM took which container
-              self.meal_shift_d = '000000' # for able_to_work() function, to decide which meal timings in the event that there's more than one choice per shift
-                            # flexi
+              self.meal_shift_d = '000000'
               self.work_shift_meal_times = {'7m': {'0': 11, '1': 12},
                                             '7n': {'0': 1, '1': 2},
                                             '8m': 11,
                                             '8n': 1,
                                             '9m': 12,
                                             '9n': 2}
-               # meal_shift_d = str(int(np.random.rand() + 0.5))
               self.work_shift_meal_times['7m'], self.work_shift_meal_times['7n'] = self.work_shift_meal_times['7m'][self.meal_shift_d[0]], self.work_shift_meal_times['7n'][self.meal_shift_d[1]]
-
        
        def get_hours(self, timedelta):
               """
@@ -98,7 +95,6 @@ class PM():
                      current_hour -= 1
                      if current_hour == -1:
                             current_hour = 23
-              # 0 represents 12:30am to 1:30am, 23 represents 11:30pm to 12:30am
               
               wsml = self.work_shift_meal_times[self.work_shift]
               # make sure there's a 2 hour gap before they panggang
@@ -106,21 +102,6 @@ class PM():
                      # 1 hour gap before they go off for lunch
                      if current_hour != wsml and self.working_hours[(wsml + 1) % 24] == 1:
                             return True
-              # have to add in their meal timings
-              # for the 7:30am - 7:30pm shifts,
-              # meal timings are 11:30am-12:30pm or 12:30pm-1:30pm
-              # for the 7:30pm - 7:30am shifts,
-              # meal timings are 1:30am-2:30am or 2:30am-3:30am
-
-              # for the 8:30am - 8:30pm shifts,
-              # meal timings are 11:30am-12:30pm
-              # for the 8:30pm - 8:30am shifts,
-              # meal timings are 1:30am-2:30am
-
-              # for the 9:30am - 9:30pm shifts,
-              # meal timings are 12:30pm-1:30pm
-              # for the 9:30pm - 9:30am shifts,
-              # meal timings are 2:30am-3:30am
               return False
 
        def reset_tracking(self):
@@ -378,7 +359,7 @@ class Simulation():
               self.forward_dd = forward_dd
               
               # at what quantity of vehicles should we start sending over empty PMs
-              self.threshold_vehicle_half = threshold_vehicle_half # if the other side has this many or below, it'll send half PMs
+              self.threshold_vehicle_half = threshold_vehicle_half 
               
               # how many PMs to move over, when either side is low in PMs
               self.move_over = move_over
@@ -390,14 +371,12 @@ class Simulation():
                                 }
               
               # tracking containers
-                            
               self.container = {'moved_index': [],
                                 'time': {'depart': [], 'arrive': []},
                                 'excess': []
                                 }
 
               # to track the progression of the amount of PMs at each location
-              # for plotting; debugging
               self.transit_track = []
               self.tuas_track = []
               self.city_track = []
@@ -553,15 +532,11 @@ class Simulation():
                                           return True
                      else:
                             if s == 'full':
-                                   # this timing would include the mounting time at PP/Tuas
-                                   # and the offload time at PP/Tuas
                                    if do > (2 + 0.25 + 0.25):
                                           return False
                                    else:
                                           return True
                             elif s == 'half':
-                                   # this timing would include the mounting time at PP/Tuas
-                                   # and the offload time at PP/Tuas
                                    if do > (1.8 + 0.25 + 0.25):
                                           return False
                                    else:
@@ -572,9 +547,6 @@ class Simulation():
                                           return False
                                    else:
                                           return True
-# =============================================================================
-#               result = list(map(boolean_generator, range(len(duration_out))))
-# =============================================================================
               result = [boolean_generator(i) for i in range(len(duration_out))]
               result = np.array(result)
               return result
@@ -611,29 +583,6 @@ class Simulation():
               """
               pms = [x for x in self.PMs.values() if x.work_shift == shift]
               end_shift_pm_locations = []
-# =============================================================================
-# old code
-#               for pm in pms:
-#                      time_stamps = pm.work_log['arrive']
-#                      if not time_stamps:
-#                             continue
-#                      start_date = time_stamps[0].date()
-#                      end_shift_timings = []
-#                      for i in range(len(time_stamps) - 1):
-#                             if shift[1] == 'm':
-#                                    if time_stamps[i + 1] != start_date:
-#                                           end_shift_timings.append(i)
-#                                           start_date += datetime.timedelta(days = 1)
-#                             else:
-#                                    if time_stamps[i + 1] != start_date:
-#                                           end_shift_timings.append(i + 1)
-#                                           start_date += datetime.timedelta(days = 1)
-#                             
-#                      end_shift_locations = [e for i, e in enumerate(pm.trips_count['dest']) if i in end_shift_timings]
-#                      if len(pm.work_log['arrive']) != len(pm.work_log['depart']):
-#                             end_shift_locations.append(pm.current_dest)
-#                      end_shift_pm_locations.append(end_shift_locations)
-# =============================================================================
               for pm in pms:
                      end_shift_timing_index = []
                      a = pm.work_log['arrive']
@@ -643,13 +592,6 @@ class Simulation():
                      end_shift_pm_locations.extend([e for i, e in enumerate(pm.trips_count['dest']) if i in end_shift_timing_index])
               tuas = end_shift_pm_locations.count('tuas')
               city = end_shift_pm_locations.count('city')
-# =============================================================================
-# old code
-#               # at this point, end_shift_pm_locations = [['city', 'tuas', ...], [...], [...], ...], each element is a list of all the locations a particular pm was at by the end of the shift
-#               for i in end_shift_pm_locations:
-#                      tuas += i.count('tuas')
-#                      city += i.count('city')
-# =============================================================================
               print('Average Location of PMs during Change Shift for:', 'Morning Shift' if shift[1] == 'm' else 'Night Shift', str(shift[0]) + ':30' + ('am' if shift[1] == 'm' else 'pm'), 'to', str(shift[0]) + ':30' + ('pm\n' if shift[1] == 'm' else 'am\n'))
               def make_autopct(values):
                      def my_autopct(pct):
@@ -926,7 +868,6 @@ class Simulation():
        
               """
               # creating the headspace in the dataset
-              ## head space is just addtional fake observations AFTER all the normal observations to deal with leftover containers
               if headspace != 0:
                      print('Invalid Dataset Format: Dataset requires resolving!\n')
                      print('Resolving dataset...')
@@ -957,7 +898,6 @@ class Simulation():
                      # this is to 'naturally' initialize the variables
                      if i == init + bl:
                             # reset tracking after the initialisation iterations
-                            # containers that have made the full trip are considered used for initialisation. those that are not will be in transit or considered backlog
                             container_bool = np.where(np.asarray(self.container['time']['arrive'][:init + bl + 1]) == 0, False, True)
                             for i, b in enumerate(container_bool):
                                    if b:
@@ -1154,12 +1094,15 @@ class Simulation():
                                                  
                             # look for the indexes of the containers that haven't been moved
                             index_zero = [ind for ind, e in enumerate(self.container['moved_index'][:i]) if e == 0]
+                            
                             # sort based on connection time (shortest to longest)
                             index_zero.sort(key = lambda x: df.iat[x, 4] - self.get_hours(disc_dt - df.iat[x, 3]))
+                            
                             # based on the container indexes, i look up its information based on the dataframe
                             for j in index_zero:
                                    # will settle the container that has the shortest connection time remaining (from the current time of pm activation to load_dt)       
                                    zero_going_to, zero_container_size, zero_disc_dt, zero_connect_time = df.iat[j, 1], df.iat[j, 2], df.iat[j, 3], df.iat[j, 4]
+                                   
                                    # while updating the connection time based on when it arrived to the port till the time we can activate a PM to send it
                                    zero_connect_time = zero_connect_time - self.get_hours(disc_dt - zero_disc_dt)
                                    if zero_container_size >= 22:
@@ -1355,7 +1298,6 @@ class Simulation():
                             # if there're no other half loads available
                             else:
                                    if going_to == 'EB_City':
-                                          # 1. too little PMs on the other side, 2. connection time is low, 3. demand towards where it's leaving from is high
                                           if (self.PMs_track[going_to[3:].lower()] < self.threshold_vehicle_half and dd_to_tuas > self.threshold_dd) or connect_time < self.threshold_connectingtime: 
                                                  # get a PM
                                                  duty_pm = self.check_pm_avail(disc_dt, 'city', 'half')
@@ -1460,4 +1402,3 @@ class Simulation():
               print('Exporting Results and Plotting Evaluation...')
               self.export_result()
               self.plot()                                                                       
-
