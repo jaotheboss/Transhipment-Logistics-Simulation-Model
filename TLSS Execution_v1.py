@@ -1,10 +1,10 @@
 """
 This module is outdated as of 16 March 2020. 
 This execution file has been replaced by:
-- Class_TSS Execution.py
+- TLSS Execution.py
 
 The simulation module has also been replaced by and split into:
-- Class_TuasShiftingSimulation.py (Simulation)
+- TransLogShiftingSimulation.py (Simulation)
 - SimulationDataCleaner.py (Cleaning)
 """
 
