@@ -1,11 +1,11 @@
 """
 This module is outdated as of 16 March 2020. 
 This module has been split and replaced by:
-- Class_TuasShiftingSimulation.py (Simulation)
+- Class_LogisticsShiftingSimulation.py (Simulation)
 - SimulationDataCleaner.py (Cleaning)
 
 The execution file has also been replaced by:
-- Class_TSS Execution.py
+- Class_TLSS Execution.py
 """
 
 """
