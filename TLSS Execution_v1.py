@@ -6,8 +6,6 @@ This execution file has been replaced by:
 The simulation module has also been replaced by and split into:
 - TransLogShiftingSimulation.py (Simulation)
 - SimulationDataCleaner.py (Cleaning)
-
-Action: Shift to Archive
 """
 
 # importing module for simulation
