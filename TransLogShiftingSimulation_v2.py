@@ -1,5 +1,5 @@
 """
-[2/2] of the module that replaced `TuasShiftingSimulation.py`.
+[2/2] of the module that replaced `TransLogShiftingSimulation_v1.py`.
 """
 import os
 import pandas as pd
