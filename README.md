@@ -25,7 +25,7 @@ Note:
 The Transhipment Logistics Shifting Simulation model consists of 3 parts - the cleaning, the model and the execution.
 
 ### The Cleaning:
-    The file `SimulationDataCleaner.py` documents all the functions and method used for cleaning the raw data into something    usable for the Simulation model. This file is used as a module in the execution file to clean and organise the data. Its    main methods are: clean() and extract_scene_data(), which can be seen in the execution file.
+The file `SimulationDataCleaner.py` documents all the functions and method used for cleaning the raw data into something    usable for the Simulation model. This file is used as a module in the execution file to clean and organise the data. Its    main methods are: clean() and extract_scene_data(), which can be seen in the execution file.
 
 ```
 For example,
