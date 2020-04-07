@@ -5,11 +5,13 @@ Created on Mon Mar 16 15:17:37 2020
 
 @author: jaoming
 """
+
 import time
 from os import chdir
 import pandas as pd
 chdir('your default directory')
 
+##### Cleaning #####
 # importing cleaner and simulation module
 from SimulationDataCleaner import SimulationDataCleaner
 import TransLogShiftingSimulation as tlss
@@ -28,6 +30,7 @@ else:
     sdcleaner = SimulationDataCleaner(clean_data) 
 data_scenario_c = sdcleaner.extract_scene_data('c')
 
+##### Initiation #####
 # create an instance of the simulation class (recreate the instance to re-initialize the parameters and the PMs)
 ## make changes to the parameters here. this will affect the simulation
 simulation = tlss.Simulation(tuas_vehicles = 150,
@@ -48,6 +51,7 @@ head_space = 0
 obs_to_bl = 1700
 obs_to_init = 400
 
+##### Simulation #####
 # start the simulation
 start_time = time.time()
 simulation.simulate_shifting(data_scenario_c[:obs_to_run],
