@@ -837,7 +837,7 @@ class Simulation():
               total_containers = len(self.container['moved_index']) - self.container['moved_index'].count('init') - self.container['moved_index'].count('hs')
               moved_1s = self.container['moved_index'].count(1)
               not_moved_0s = self.container['moved_index'].count(0)
-              couldnt_move_n2 = self.container['moved_index'].count('N2')
+              couldnt_move_n2 = self.container['moved_index'].count('Late')
               print('\nStatus of Containers (Count):')
               print('Moved:    ', moved_1s, '   \t(' + str(round((moved_1s / total_containers)*100, 2)) + '%)')
               print('Untouched:', not_moved_0s, '   \t(' + str(round((not_moved_0s / total_containers)*100, 2)) + '%)')
@@ -1032,12 +1032,12 @@ class Simulation():
                                                         self.PMs_track['transit']['size'] += ['full']
        
                                                         if df.iat[j, 4] - self.get_hours(disc_dt - df.iat[j, 3]) <= self.travel_duration('half', disc_dt):
-                                                               self.container['moved_index'][h] = 'N2'
+                                                               self.container['moved_index'][h] = 'Late'
                                                         else:
                                                                self.container['moved_index'][h] = 1
                                                                
                                                         if df.iat[j, 4] - self.get_hours(disc_dt - df.iat[j, 3]) <= self.travel_duration('half', disc_dt):
-                                                               self.container['moved_index'][h_index] = 'N2'
+                                                               self.container['moved_index'][h_index] = 'Late'
                                                         else:
                                                                self.container['moved_index'][h_index] = 1
 
@@ -1074,12 +1074,12 @@ class Simulation():
                                                         self.PMs_track['transit']['size'] += ['full']
                                                         
                                                         if df.iat[j, 4] - self.get_hours(disc_dt - df.iat[j, 3]) <= self.travel_duration('half', disc_dt):
-                                                               self.container['moved_index'][h] = 'N2'
+                                                               self.container['moved_index'][h] = 'Late'
                                                         else:
                                                                self.container['moved_index'][h] = 1
                                                                
                                                         if df.iat[j, 4] - self.get_hours(disc_dt - df.iat[j, 3]) <= self.travel_duration('half', disc_dt):
-                                                               self.container['moved_index'][h_index] = 'N2'
+                                                               self.container['moved_index'][h_index] = 'Late'
                                                         else:
                                                                self.container['moved_index'][h_index] = 1
                                                                
@@ -1131,9 +1131,9 @@ class Simulation():
                                                         self.PMs_track['transit']['index'] += [j]
                                                         self.PMs_track['transit']['size'] += [zero_container_size]
 
-                                                        # if we missed it, we mark as N2
+                                                        # if we missed it, we mark as Late
                                                         if zero_connect_time <= self.travel_duration(zero_container_size, disc_dt):
-                                                               self.container['moved_index'][j] = 'N2'
+                                                               self.container['moved_index'][j] = 'Late'
                                                         else:
                                                                self.container['moved_index'][j] = 1
                                                         self.container['time']['depart'][j] = disc_dt + datetime.timedelta(minutes = 15)
@@ -1161,9 +1161,9 @@ class Simulation():
                                                         self.PMs_track['transit']['index'] += [j]
                                                         self.PMs_track['transit']['size'] += [zero_container_size]
        
-                                                        # if we missed it, we mark as N2
+                                                        # if we missed it, we mark as Late
                                                         if zero_connect_time <= self.travel_duration(zero_container_size, disc_dt):
-                                                               self.container['moved_index'][j] = 'N2'
+                                                               self.container['moved_index'][j] = 'Late'
                                                         else:
                                                                self.container['moved_index'][j] = 1
                                                         self.container['time']['depart'][j] = disc_dt + datetime.timedelta(minutes = 15)
