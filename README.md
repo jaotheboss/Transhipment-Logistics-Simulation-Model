@@ -1,6 +1,8 @@
 # Transhipment-Simulation-Model
 Simulation Model of the movement of transhipment logistics from 1 location to another to ascertain its timeliness.
 
+![TLSS Image](https://github.com/jaotheboss/Transhipment-Logistics-Simulation-Model/blob/master/Transhipment%20Image.jpg)
+
 This project was inspired during my internship with PSA, with the objective of this simulation being:
     
     1. To determine the effects of the number of movers with regards to the containers arrival time
