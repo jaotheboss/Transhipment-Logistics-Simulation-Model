@@ -13,8 +13,8 @@ chdir('your default directory')
 
 ##### Cleaning #####
 # importing cleaner and simulation module
-from SimulationDataCleaner import SimulationDataCleaner
-import TransLogShiftingSimulation as tlss
+from src.SimulationDataCleaner import SimulationDataCleaner
+import src.TransLogShiftingSimulation as tlss
 
 # cleaning and extracting of data
 from_start = False # if we want to start from a raw file
